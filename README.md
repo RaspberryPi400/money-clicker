@@ -3,3 +3,5 @@ This is like Cookie Clicker, but it's Money Clicker! Every time you click the mo
 
 # Dependencies
 The Python code depends on Pygame, which you can install by running 'pip install pygame' in your terminal.
+
+Money Clicker Copyright (c) 2026 Elijah Corwin is licensed under a MIT license. Go to the LICENSE file for the legal code.
