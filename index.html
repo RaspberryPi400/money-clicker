@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Clicker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #ffffff;
+            color: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #ui-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #game-area {
+            display: flex;
+            width: 100%;
+            max-width: 600px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #upgrades {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .upgrade-btn {
+            background-color: #c8c8c8;
+            border: 2px solid #000;
+            padding: 10px 15px;
+            width: 200px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.1s;
+        }
+
+        .upgrade-btn:active {
+            background-color: #a0a0a0;
+        }
+
+        .upgrade-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* CSS styled dollar bill so you don't need an image file right away */
+        #money-btn {
+            width: 300px;
+            height: 150px;
+            background-color: #00c800;
+            border: 4px solid #005000;
+            border-radius: 10px;
+            color: white;
+            font-size: 60px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            box-shadow: 0 8px #007800;
+        }
+
+        #money-btn:active {
+            box-shadow: 0 4px #007800;
+            transform: translateY(4px);
+        }
+
+        #win-screen {
+            display: none;
+            position: fixed;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            border: 4px solid #000;
+            padding: 20px 40px;
+            font-size: 60px;
+            font-weight: bold;
+            color: #00c800;
+            text-align: center;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-container">
+        <div>
+            <div id="cash-display">Cash: $0</div>
+            <div id="power-display">Cash per click: $1</div>
+        </div>
+        <div id="goal-display">Goal: $10000</div>
+    </div>
+
+    <div id="game-area">
+        <div id="upgrades">
+            </div>
+
+        <div id="money-btn" onclick="clickMoney()">
+            💵
+        </div>
+    </div>
+
+    <div id="win-screen">YOU WON!</div>
+
+    <script>
+        // Game Variables
+        let cash = 0;
+        let cashPerClick = 1;
+        let won = false;
+        const WIN_CONDITION = 10000;
+
+        // Upgrades Array
+        let upgrades = [
+            { id: 0, name: "Basic Clicker", baseCost: 50, cost: 50, boost: 2 },
+            { id: 1, name: "Better Mouse", baseCost: 500, cost: 500, boost: 15 },
+            { id: 2, name: "Money Printer", baseCost: 2500, cost: 2500, boost: 100 }
+        ];
+
+        // HTML Elements
+        const cashDisplay = document.getElementById("cash-display");
+        const powerDisplay = document.getElementById("power-display");
+        const winScreen = document.getElementById("win-screen");
+        const upgradesContainer = document.getElementById("upgrades");
+
+        // Initialize Upgrade Buttons
+        function initUpgrades() {
+            upgradesContainer.innerHTML = '';
+            upgrades.forEach(upg => {
+                let btn = document.createElement("button");
+                btn.className = "upgrade-btn";
+                btn.id = "upg-" + upg.id;
+                btn.onclick = () => buyUpgrade(upg.id);
+                btn.innerHTML = `
+                    <div>${upg.name} (+$${upg.boost})</div>
+                    <div id="cost-${upg.id}">Cost: $${upg.cost}</div>
+                `;
+                upgradesContainer.appendChild(btn);
+            });
+            updateUI();
+        }
+
+        // Click the Money Function
+        function clickMoney() {
+            cash += cashPerClick;
+            
+            if (cash >= WIN_CONDITION && !won) {
+                won = true;
+                winScreen.style.display = "block";
+            }
+            
+            updateUI();
+        }
+
+        // Buy Upgrade Function
+        function buyUpgrade(id) {
+            let upg = upgrades[id];
+            if (cash >= upg.cost) {
+                cash -= upg.cost;
+                cashPerClick += upg.boost;
+                
+                // Increase cost by 50%
+                upg.cost = Math.floor(upg.cost * 1.5);
+                
+                updateUI();
+            }
+        }
+
+        // Update Text and Button Colors
+        function updateUI() {
+            cashDisplay.innerText = `Cash: $${cash}`;
+            powerDisplay.innerText = `Cash per click: $${cashPerClick}`;
+
+            // Update upgrade texts and disable/enable based on affordability
+            upgrades.forEach(upg => {
+                document.getElementById(`cost-${upg.id}`).innerText = `Cost: $${upg.cost}`;
+                let btn = document.getElementById(`upg-${upg.id}`);
+                
+                if (cash >= upg.cost) {
+                    btn.classList.remove("disabled");
+                } else {
+                    btn.classList.add("disabled");
+                }
+            });
+        }
+
+        // Run setup when page loads
+        initUpgrades();
+    </script>
+    <footer>
+        <p>Copyright (c) 2026 Elijah Corwin</p>
+        <p><a href="https://raspberrypi400.github.io/my-projects/" target="_blank" rel="noopener noreferrer">See my other projects here</a></p>
+    </footer>
+</body>
+</html>
